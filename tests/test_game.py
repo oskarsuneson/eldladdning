@@ -45,13 +45,16 @@ class TestMissions(GameTestCase):
             for t in m.targets:
                 self.assertTrue(0 <= t.x <= e.MAP_M and 0 <= t.y <= e.MAP_M)
 
-    def test_tutorial_starts_open_then_remembered(self):
+    def test_tutorial_shows_every_start_until_turned_off(self):
         self.assertEqual(self.g.tut, 0)
         for _ in range(len(e.TUTORIAL)):
             self.g.tut_next()
         self.assertIsNone(self.g.tut)
-        self.assertTrue(e.load_profile()["tutorial_done"])
+        self.assertEqual(e.Game().tut, 0)          # visas igen vid nasta start
+        self.g.run("TUTORIAL AV")
         self.assertIsNone(e.Game().tut)
+        self.g.run("TUTORIAL PA")
+        self.assertEqual(e.Game().tut, 0)
 
     def test_destroying_all_targets_wins(self):
         g = self.g

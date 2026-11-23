@@ -29,8 +29,8 @@ Kommandon (flera pa samma rad ar ok):
   KORR        FDC raknar korrektion fran spejarens senaste rapport
   BUTIK       oppna/stang butiken      KOP 1   kop sak nummer 1
   SPARA       spara nu                 NOLLSTALL JA   radera all progress
-  TUTORIAL    visa hjalpen igen        Q       spara och avsluta
-              (HJALP fungerar ocksa)
+  ?           visa tutorialen igen     Q       spara och avsluta
+              (TUTORIAL och HJALP fungerar ocksa)
 Exempel:  MAL A AZ 28.3 EL 41.7 LAD 2 APHE ELD
 """
 import json
@@ -113,7 +113,8 @@ TUTORIAL = [
         ("KORR", "FDC raknar om AZ och EL fran spejarens senaste rapport (kraver spejare)."),
         ("BUTIK", "Oppna/stang butiken. KOP 1 kopar vara nummer 1 (kraver poang)."),
         ("SPARA", "Spara direkt. Spelet sparar ocksa automatiskt efter varje uppdrag och kop."),
-        ("TUTORIAL", "Visa den har hjalpen igen (HJALP fungerar ocksa)."),
+        ("? eller TUTORIAL", "Visa den har hjalpen igen (tryck ? pa tom rad, eller skriv HJALP)."),
+        ("TUTORIAL AV / PA", "Stang av / satt pa att tutorialen visas automatiskt vid varje start."),
         ("NOLLSTALL JA", "Radera ALL sparad progress."),
         ("Q", "Spara och avsluta."),
         "Tips: flera kommandon pa en rad, t.ex.  MAL A AZ 28.3 EL 41.7 LAD 2 APHE ELD",
@@ -142,6 +143,7 @@ TUTORIAL = [
         "APHE (300), precisionsoptik (400), fortroende +1 (500).",
         "Uppdrag 1 har gratis spejare sa du kan ova. Darefter kopar du spejare i butiken.",
         "Spelet sparas i filen .eldledning_save.json i din hemmapp.",
+        "Tryck ? nar som helst for att se den har tutorialen igen.",
         "Tryck ENTER eller klicka for att borja. Lycka till!",
     ]),
 ]
@@ -150,7 +152,7 @@ MIN_W, MIN_H = 110, 30
 
 DEFAULT_PROFILE = dict(points=0, run_done=0, trust=3, best=0, won=0,
                        he_extra=0, aphe_extra=0, optics=0, perm_spotter=False,
-                       tutorial_done=False)
+                       tutorial_done=False, tutorial_auto=True)
 
 
 def enter_keys():
@@ -177,6 +179,7 @@ def load_profile():
     p["optics"] = min(3, max(0, int(p["optics"])))
     p["perm_spotter"] = bool(p["perm_spotter"])
     p["tutorial_done"] = bool(p["tutorial_done"])
+    p["tutorial_auto"] = bool(p["tutorial_auto"])
     return p
 
 
@@ -314,7 +317,8 @@ class Game:
         self.buf = ""
         self.shop_open = False
         self.gameover = False
-        self.tut = None if self.p["tutorial_done"] else 0
+        self.tut = 0 if self.p["tutorial_auto"] else None   # visas vid varje start
+        self.tut_scroll = 0
         self._click_t = 0.0
         self.say("HEJ. SKA VI SPELA ETT SPEL?", "hi")
         if self.p["run_done"] or self.p["points"] or self.p["won"]:
@@ -407,6 +411,7 @@ class Game:
     # ----- tutorial -----
     def open_tutorial(self):
         self.tut = 0
+        self.tut_scroll = 0
 
     def close_tutorial(self):
         self.tut = None
@@ -421,12 +426,18 @@ class Game:
             self.close_tutorial()
         else:
             self.tut += 1
+            self.tut_scroll = 0
 
     def tut_key(self, k):
         if k in enter_keys() or k in (32, curses.KEY_RIGHT):
             self.tut_next()
+        elif k == curses.KEY_DOWN:
+            self.tut_scroll += 1                 # begransas i draw_tutorial
+        elif k == curses.KEY_UP:
+            self.tut_scroll = max(0, self.tut_scroll - 1)
         elif k in (curses.KEY_LEFT, curses.KEY_BACKSPACE, 127, 8):
             self.tut = max(0, self.tut - 1)
+            self.tut_scroll = 0
         elif k in (27, ord("s"), ord("S"), ord("q"), ord("Q")):
             self.close_tutorial()
 
@@ -503,6 +514,9 @@ class Game:
             self.tut_key(k)
             return False
         back_keys = (127, 8, curses.KEY_BACKSPACE)
+        if k == ord("?") and not self.buf and self.state != "flight":
+            self.open_tutorial()          # ? pa tom rad oppnar tutorialen direkt
+            return False
         if k in enter_keys():
             line = self.buf.strip()
             self.buf = ""
@@ -521,7 +535,7 @@ class Game:
             if u and u[0] in ("Q", "SLUT", "EXIT"):
                 return True
             if u and u[0] in ("BUTIK", "KOP", "KOPA", "SPARA", "HJALP",
-                              "TUTORIAL", "INTRO", "NOLLSTALL"):
+                              "TUTORIAL", "INTRO", "NOLLSTALL", "?", "H"):
                 self.say("> " + line.upper(), "n")
                 return self.run(line)
             self.new_mission()
@@ -572,6 +586,13 @@ class Game:
             i += 1
             if c in ("Q", "SLUT", "EXIT", "AVSLUTA"):
                 return True
+            if c in ("TUTORIAL", "INTRO") and i < len(t) and t[i] in ("AV", "OFF", "PA", "ON"):
+                self.p["tutorial_auto"] = t[i] in ("PA", "ON")
+                self.save()
+                self.say("TUTORIAL VISAS " + ("VID VARJE START." if self.p["tutorial_auto"]
+                                               else "INTE LANGRE VID START (? FUNGERAR)."), "ok")
+                i += 1
+                continue
             if c in ("HJALP", "HELP", "?", "H", "TUTORIAL", "INTRO"):
                 self.open_tutorial()
                 break
@@ -844,26 +865,39 @@ def draw_tutorial(scr, g):
     put(scr, by + 1, bx + 3, f"TUTORIAL - {title}", G_B)
     put(scr, by + 1, bx + bw - 14, f"SIDA {g.tut + 1}/{len(TUTORIAL)}", G_B)
     inner = bw - 6
-    y = by + 3
-    limit = by + bh - 3
+    lines = []                       # (x-offset, text, attr)
     for item in items:
-        if y >= limit:
-            break
         if isinstance(item, tuple):
             cmd, desc = item
-            put(scr, y, bx + 3, cmd, YEL)
-            for ln in textwrap.wrap(desc, inner - 18) or [""]:
-                if y >= limit:
-                    break
-                put(scr, y, bx + 3 + 18, ln, GREEN)
-                y += 1
+            wrapped = textwrap.wrap(desc, max(10, inner - 20)) or [""]
+            for j, ln in enumerate(wrapped):
+                if j == 0:
+                    lines.append(("row", cmd, ln))   # kommando + forsta radens text
+                else:
+                    lines.append((20, ln, GREEN))
         else:
             for ln in textwrap.wrap(item, inner - 2, initial_indent="- ",
                                     subsequent_indent="  "):
-                if y >= limit:
-                    break
-                put(scr, y, bx + 3, ln, GREEN)
-                y += 1
+                lines.append((0, ln, GREEN))
+    top = by + 3
+    room = (by + bh - 3) - top
+    max_scroll = max(0, len(lines) - room)
+    g.tut_scroll = min(g.tut_scroll, max_scroll)
+    y = top
+    for entry in lines[g.tut_scroll:g.tut_scroll + room]:
+        if entry[0] == "row":
+            put(scr, y, bx + 3, entry[1], YEL)
+            put(scr, y, bx + 3 + 20, entry[2], GREEN)
+        else:
+            put(scr, y, bx + 3 + entry[0], entry[1], entry[2])
+        y += 1
+    if max_scroll:
+        more = []
+        if g.tut_scroll > 0:
+            more.append("PIL UPP = MER ^")
+        if g.tut_scroll < max_scroll:
+            more.append("PIL NER = MER v")
+        put(scr, by + 2, bx + bw - 3 - 32, "  ".join(more).rjust(32), YEL)
     last = g.tut + 1 >= len(TUTORIAL)
     nxt = "ENTER/KLICK = BORJA SPELA" if last else "ENTER/KLICK = NASTA"
     put(scr, by + bh - 2, bx + 3,
@@ -1112,6 +1146,10 @@ def ensure_curses():
             except Exception as ex:                 # noqa: BLE001
                 print("Installationen misslyckades:", ex)
         print("Installera manuellt med:  python -m pip install windows-curses")
+        print("Om pip sager att inget passande hittas ar din Python for ny")
+        print("(windows-curses finns for Python 3.9-3.13). Installera Python 3.13:")
+        print("  winget install Python.Python.3.13")
+        print("och starta sedan spelet med:  py -3.13 eldledning.py")
     else:
         print("Python-modulen 'curses' saknas pa den har datorn.")
     return False

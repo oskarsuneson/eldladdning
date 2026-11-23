@@ -16,11 +16,11 @@ Fungerar på **Linux, macOS och Windows**. Ingen internetanslutning behövs.
 - Utan **spejare** syns varken mål eller nedslag på kartan; spejare köps i **butiken** med poäng
 - Butik med uppgraderingar (extra granater, precisionsoptik, fast spejare, förtroende)
 - Din progress **sparas automatiskt** mellan spelomgångar
-- Inbyggd **tutorial** som visas första gången (klicka eller tryck ENTER för att bläddra, `S` för att hoppa över)
+- Inbyggd **tutorial** som visas vid varje start (klicka eller tryck ENTER för att bläddra, pil upp/ner för att scrolla, `S` för att hoppa över, `TUTORIAL AV` för att stänga av)
 
 ## Kom igång
 
-Du behöver Python 3.9 eller nyare och en terminal som är minst **110 tecken bred och 30 rader hög**
+Du behöver Python 3.9 eller nyare (på Windows 3.9–3.13, se nedan) och en terminal som är minst **110 tecken bred och 30 rader hög**
 (maximera fönstret om spelet ber dig göra det större).
 
 ### Linux
@@ -39,16 +39,29 @@ Standardfönstret i Terminal är litet – dra ut det eller kör i helskärm.
 
 ### Windows (PowerShell eller Windows Terminal)
 
-Windows saknar Pythons `curses`-modul, så installera den en gång:
+Windows saknar Pythons `curses`-modul, så den installeras med paketet `windows-curses`.
+Det paketet finns än så länge bara för **Python 3.9–3.13** – inte för 3.14/3.15. Har du en
+nyare Python, installera 3.13 bredvid den (påverkar inte din vanliga Python):
 
 ```powershell
-python -m pip install -r requirements.txt
-python eldledning.py
+winget install Python.Python.3.13
 ```
 
-Du kan också bara köra `python eldledning.py` – spelet erbjuder då att installera
-`windows-curses` åt dig. Det finns även `start_windows.bat` (dubbelklicka) och
-`start_mac_linux.sh`.
+Stäng och öppna PowerShell igen, gå sedan **till mappen där du packade upp spelet**
+(kommandona nedan fungerar bara där filerna ligger) och kör, ett kommando i taget:
+
+```powershell
+cd C:\sokvag\till\eldledning-repo
+py -3.13 -m pip install -r requirements.txt
+py -3.13 eldledning.py
+```
+
+Har du redan Python 3.9–3.13 som standard fungerar `python` i stället för `py -3.13`.
+
+Enklast: dubbelklicka på `start_windows.bat`. Den letar själv upp en fungerande Python,
+installerar `windows-curses` vid behov och startar spelet.
+
+Gör fönstret stort (minst 110×30) innan du startar.
 
 ## Så spelar du
 
@@ -76,7 +89,8 @@ Du kan också bara köra `python eldledning.py` – spelet erbjuder då att inst
 | `KORR` | FDC räknar om AZ och EL från spejarens senaste rapport (kräver spejare) |
 | `BUTIK` | Öppna/stäng butiken; `KOP 1` köper vara nummer 1 |
 | `SPARA` | Spara direkt (sker även automatiskt) |
-| `TUTORIAL` | Visa tutorialen igen (`HJALP` fungerar också) |
+| `?` | Visa tutorialen igen (tryck `?` på tom rad; `TUTORIAL` och `HJALP` fungerar också) |
+| `TUTORIAL AV` / `TUTORIAL PA` | Stäng av / sätt på att tutorialen visas automatiskt vid start |
 | `NOLLSTALL JA` | Radera all sparad progress |
 | `Q` | Spara och avsluta |
 
@@ -105,7 +119,9 @@ GitHub Actions kör testerna på Ubuntu, macOS och Windows (se `.github/workflow
 ## Felsökning
 
 - **"Gör terminalen större"** – maximera fönstret (minst 110×30).
-- **Windows: `No module named '_curses'`** – kör `python -m pip install windows-curses`.
+- **Windows: `No matching distribution found for windows-curses`** – din Python är för ny (3.14/3.15). Installera Python 3.13 och kör med `py -3.13` (se Windows ovan).
+- **Windows: `No module named '_curses'`** – kör `py -3.13 -m pip install windows-curses`.
+- **`Could not open requirements file`** – du står i fel mapp. Gå först till mappen med spelets filer.
 - **Tecken ser konstiga ut** – spelet använder bara ASCII, men prova Windows Terminal i stället för gamla cmd.exe.
 
 ## Licens
