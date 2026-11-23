@@ -29,6 +29,14 @@ Du behöver Python 3.9 eller nyare (på Windows 3.9–3.13, se nedan) och en ter
 python3 eldledning.py
 ```
 
+Eller kör startfilen, som kontrollerar Python och gör fönstret större:
+
+```bash
+sh start_linux.sh
+```
+
+(Eller `chmod +x start_linux.sh` en gång och sedan `./start_linux.sh`.)
+
 ### macOS
 
 ```bash
@@ -36,6 +44,11 @@ python3 eldledning.py
 ```
 
 Standardfönstret i Terminal är litet – dra ut det eller kör i helskärm.
+
+Eller dubbelklicka på **`start_mac.command`** i Finder – den gör fönstret större och startar spelet.
+Första gången kan macOS blockera filen: högerklicka → **Öppna** → **Öppna**. Om det står
+*"permission denied"* (det händer när filen laddats upp via webben och tappat sin körrättighet),
+kör `chmod +x start_mac.command` i Terminal, eller starta med `sh start_mac.command`.
 
 ### Windows (PowerShell eller Windows Terminal)
 

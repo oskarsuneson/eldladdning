@@ -29,6 +29,14 @@ Du behöver Python 3.9 eller nyare (på Windows 3.9–3.13, se nedan) och en ter
 python3 eldledning.py
 ```
 
+Eller kör startfilen, som kontrollerar Python och gör fönstret större:
+
+```bash
+sh start_linux.sh
+```
+
+(Eller `chmod +x start_linux.sh` en gång och sedan `./start_linux.sh`.)
+
 ### macOS
 
 ```bash
@@ -37,29 +45,41 @@ python3 eldledning.py
 
 Standardfönstret i Terminal är litet – dra ut det eller kör i helskärm.
 
+Eller dubbelklicka på **`start_mac.command`** i Finder – den gör fönstret större och startar spelet.
+Första gången kan macOS blockera filen: högerklicka → **Öppna** → **Öppna**. Om det står
+*"permission denied"* (det händer när filen laddats upp via webben och tappat sin körrättighet),
+kör `chmod +x start_mac.command` i Terminal, eller starta med `sh start_mac.command`.
+
 ### Windows (PowerShell eller Windows Terminal)
 
 Windows saknar Pythons `curses`-modul, så den installeras med paketet `windows-curses`.
-Det paketet finns än så länge bara för **Python 3.9–3.13** – inte för 3.14/3.15. Har du en
-nyare Python, installera 3.13 bredvid den (påverkar inte din vanliga Python):
+Det paketet finns än så länge bara för **Python 3.9–3.13** – inte för 3.14/3.15.
+
+**1. Installera Python 3.13** (om du har en nyare Python; den påverkar inte din vanliga):
 
 ```powershell
 winget install Python.Python.3.13
 ```
 
-Stäng och öppna PowerShell igen, gå sedan **till mappen där du packade upp spelet**
-(kommandona nedan fungerar bara där filerna ligger) och kör, ett kommando i taget:
+Stäng och öppna PowerShell igen efteråt.
+
+**2. Ladda ner och packa upp spelet.** Tryck på **Code → Download ZIP** här på GitHub och
+packa upp zip-filen (högerklicka → *Extract All*).
+
+**3. Starta spelet – det enklaste sättet:** öppna den uppackade mappen och dubbelklicka på
+**`start_windows.bat`**. Den hittar själv en fungerande Python, installerar `windows-curses`
+vid behov och startar spelet.
+
+**Eller starta från PowerShell:** gå först till den uppackade mappen med `cd` (mappnamnet
+beror på vad repot heter – skriv `dir` för att se vad som finns, och du ska se `eldledning.py`
+i listan när du står rätt). Kör sedan, ett kommando i taget:
 
 ```powershell
-cd C:\sokvag\till\eldledning-repo
 py -3.13 -m pip install -r requirements.txt
 py -3.13 eldledning.py
 ```
 
 Har du redan Python 3.9–3.13 som standard fungerar `python` i stället för `py -3.13`.
-
-Enklast: dubbelklicka på `start_windows.bat`. Den letar själv upp en fungerande Python,
-installerar `windows-curses` vid behov och startar spelet.
 
 Gör fönstret stort (minst 110×30) innan du startar.
 
@@ -121,7 +141,7 @@ GitHub Actions kör testerna på Ubuntu, macOS och Windows (se `.github/workflow
 - **"Gör terminalen större"** – maximera fönstret (minst 110×30).
 - **Windows: `No matching distribution found for windows-curses`** – din Python är för ny (3.14/3.15). Installera Python 3.13 och kör med `py -3.13` (se Windows ovan).
 - **Windows: `No module named '_curses'`** – kör `py -3.13 -m pip install windows-curses`.
-- **`Could not open requirements file`** – du står i fel mapp. Gå först till mappen med spelets filer.
+- **`Could not open requirements file` / `can't open file 'eldledning.py'`** – du står i fel mapp. Gå först till mappen med spelets filer (`cd` till den, kontrollera med `dir`).
 - **Tecken ser konstiga ut** – spelet använder bara ASCII, men prova Windows Terminal i stället för gamla cmd.exe.
 
 ## Licens
