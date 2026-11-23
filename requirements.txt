@@ -1,0 +1,2 @@
+# curses ingar i Python pa Linux och macOS. Windows behover detta paket:
+windows-curses; platform_system == "Windows"
