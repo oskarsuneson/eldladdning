@@ -15,7 +15,7 @@ Fungerar på **Linux, macOS och Windows**. Ingen internetanslutning behövs.
 - **Exakt information:** koordinater, avstånd och azimut med decimaler, beräknat nedslag, flygtid och spridning
 - **Inskjutning med `KORR`:** vindmätningen har ett okänt fel. Ett observerat nedslag låter FDC räkna ut det verkliga vindfelet – fler nedslag ger säkrare värde
 - **Bläddra mellan mål** med `TAB` / `SHIFT+TAB`, pilarna eller `NASTA` / `FORRA`
-- Flera mål (A–D) per uppdrag, ibland tätt ihop så att en granat kan träffa flera
+- Upp till fyra mål (A–D) per uppdrag, ibland tätt ihop så att en granat kan träffa flera
 - **Fem granater:** `HE`, `APHE`, `FRAG` (enorm radie, nästan ingen skada mot pansar), `HEAT` (måste träffa exakt, slår ut allt i ett skott) och `LJUS` (belyser området och avslöjar fiender)
 - **Okända kontakter:** dolda bonusmål som bara syns när de belyses av LJUS (eller sprängs av splitter)
 - Måltyper: infanteri, lastbilskolonner, pansar, bunkrar, radar, artilleribatterier m.fl.
@@ -38,10 +38,8 @@ python3 eldledning.py
 Eller kör startfilen, som kontrollerar Python och gör fönstret större:
 
 ```bash
-sh start_linux.sh
+./start_linux.sh
 ```
-
-(Eller `chmod +x start_linux.sh` en gång och sedan `./start_linux.sh`.)
 
 ### macOS
 
@@ -52,9 +50,8 @@ python3 eldledning.py
 Standardfönstret i Terminal är litet – dra ut det eller kör i helskärm.
 
 Eller dubbelklicka på **`start_mac.command`** i Finder – den gör fönstret större och startar spelet.
-Första gången kan macOS blockera filen: högerklicka → **Öppna** → **Öppna**. Om det står
-*"permission denied"* (det händer när filen laddats upp via webben och tappat sin körrättighet),
-kör `chmod +x start_mac.command` i Terminal, eller starta med `sh start_mac.command`.
+Första gången kan macOS blockera filen: högerklicka → **Öppna** → **Öppna**. Om det ändå står
+*"permission denied"*, starta med `sh start_mac.command` i Terminal.
 
 ### Windows (PowerShell eller Windows Terminal)
 
@@ -113,7 +110,7 @@ HEAT ska träffa nästan varje gång även på 5 km.
 
 | Kommando | Vad det gör |
 |---|---|
-| `MAL A` | Välj mål (A–F) |
+| `MAL A` | Välj mål (A–F; okända kontakter får bokstäverna efter uppdragets vanliga mål) |
 | `TAB` / `SHIFT+TAB`, `NASTA` / `FORRA` | Bläddra till nästa / föregående mål (pil höger/vänster fungerar på tom rad) |
 | `PUNKT A` | FDC räknar ut AZ, EL och LAD så att granaten landar exakt på mål A (vind inräknad). Utan namn: valt mål |
 | `PUNKT A 30 -10` | Samma, men 30 m öst och 10 m söder om mål A (öst +, norr +) |
