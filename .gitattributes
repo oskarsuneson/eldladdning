@@ -1,0 +1,6 @@
+# Skalskript maste ha LF-radslut, annars startar de inte pa Linux/macOS.
+*.sh       text eol=lf
+*.command  text eol=lf
+
+# .bat ska ha CRLF. Filen lagras redan sa, sa git ska inte rora radsluten.
+*.bat      -text
