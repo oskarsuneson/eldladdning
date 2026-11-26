@@ -26,7 +26,7 @@ Fungerar på **Linux, macOS och Windows**. Ingen internetanslutning behövs.
 
 ## Kom igång
 
-Du behöver Python 3.9 eller nyare (på Windows 3.9–3.13, se nedan) och en terminal som är minst **110 tecken bred och 30 rader hög**
+Du behöver Python 3 (spelet testas med Python 3.13; på Windows finns en övre gräns, se nedan) och en terminal som är minst **110 tecken bred och 30 rader hög**
 (maximera fönstret om spelet ber dig göra det större).
 
 ### Linux
@@ -56,7 +56,7 @@ Första gången kan macOS blockera filen: högerklicka → **Öppna** → **Öpp
 ### Windows (PowerShell eller Windows Terminal)
 
 Windows saknar Pythons `curses`-modul, så den installeras med paketet `windows-curses`.
-Det paketet finns än så länge bara för **Python 3.9–3.13** – inte för 3.14/3.15.
+Det paketet finns inte för de allra nyaste Python-versionerna, så använd **Python 3.13**.
 
 **1. Installera Python 3.13** (om du har en nyare Python; den påverkar inte din vanliga):
 
@@ -82,7 +82,7 @@ py -3.13 -m pip install -r requirements.txt
 py -3.13 eldledning.py
 ```
 
-Har du redan Python 3.9–3.13 som standard fungerar `python` i stället för `py -3.13`.
+Har du redan Python 3.13 som standard fungerar `python` i stället för `py -3.13`.
 
 Gör fönstret stort (minst 110×30) innan du startar.
 
@@ -159,7 +159,7 @@ Progress sparas i `.eldledning_save.json` i din hemmapp (`~` på Linux/macOS,
 python3 -m unittest discover -s tests -v
 ```
 
-GitHub Actions kör testerna på Ubuntu, macOS och Windows (se `.github/workflows/test.yml`).
+GitHub Actions kör testerna på Ubuntu, macOS och Windows med Python 3.13 (se `.github/workflows/test.yml`).
 
 ## Felsökning
 
